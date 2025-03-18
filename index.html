@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Threat Intelligence Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="dark-mode">
+    <div class="cyber-background">
+        <div class="grid-overlay"></div>
+        <div class="particles-container" id="particles-js"></div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="dashboard-title">CYBER THREAT INTEL</h1>
+        </div>
+        <div class="header-controls">
+            <div class="threat-level">
+                <span class="threat-level-label">Global Threat Level:</span>
+                <div class="threat-indicator" id="globalThreatLevel">
+                    <span class="threat-dot high"></span>
+                    <span class="threat-text">HIGH</span>
+                </div>
+            </div>
+            <div class="time-container">
+                <div class="digital-clock" id="digitalClock">00:00:00</div>
+                <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+            </div>
+            <div class="control-buttons">
+                <button id="themeToggle" class="theme-toggle" title="Toggle Light/Dark Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="settingsButton" class="settings-button" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Feed Categories</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="category-filters">
+                <div class="category-item active" data-category="all">
+                    <i class="fas fa-globe"></i>
+                    <span>All Sources</span>
+                    <span class="count" id="allCount">0</span>
+                </div>
+                <div class="category-item" data-category="government">
+                    <i class="fas fa-landmark"></i>
+                    <span>Government</span>
+                    <span class="count" id="governmentCount">0</span>
+                </div>
+                <div class="category-item" data-category="news">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                    <span class="count" id="newsCount">0</span>
+                </div>
+                <div class="category-item" data-category="blogs">
+                    <i class="fas fa-blog"></i>
+                    <span>Blogs</span>
+                    <span class="count" id="blogsCount">0</span>
+                </div>
+                <div class="category-item" data-category="vendors">
+                    <i class="fas fa-building"></i>
+                    <span>Vendors</span>
+                    <span class="count" id="vendorsCount">0</span>
+                </div>
+                <div class="category-item" data-category="research">
+                    <i class="fas fa-flask"></i>
+                    <span>Research</span>
+                    <span class="count" id="researchCount">0</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Threat Statistics</h3>
+                <div class="threat-stats">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Recent Activity</h3>
+                <div class="activity-timeline" id="activityTimeline">
+                    <!-- Activity items will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Quick Filters</h3>
+                <div class="quick-filters">
+                    <button class="filter-button" data-filter="critical">
+                        <i class="fas fa-exclamation-triangle"></i> Critical
+                    </button>
+                    <button class="filter-button" data-filter="today">
+                        <i class="fas fa-calendar-day"></i> Today
+                    </button>
+                    <button class="filter-button" data-filter="vulnerabilities">
+                        <i class="fas fa-bug"></i> Vulnerabilities
+                    </button>
+                    <button class="filter-button" data-filter="malware">
+                        <i class="fas fa-virus"></i> Malware
+                    </button>
+                    <button class="filter-button" data-filter="bookmarked">
+                        <i class="fas fa-bookmark"></i> Bookmarked
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="control-panel">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search threats...">
+                    <button id="searchButton" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <div class="feed-controls">
+                    <div class="view-options">
+                        <button class="view-button active" data-view="card" title="Card View">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-button" data-view="list" title="List View">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="sort-options">
+                        <select id="sortSelect" class="sort-select">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="severity">Severity</option>
+                            <option value="source">Source</option>
+                        </select>
+                    </div>
+                    
+                    <button id="refreshButton" class="refresh-button" title="Refresh Feeds">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="feeds-container">
+                <div class="feeds-header">
+                    <h2>Threat Intelligence Feeds</h2>
+                    <div class="feeds-stats">
+                        <span id="feedCount">0</span> feeds | <span id="articleCount">0</span> articles
+                    </div>
+                </div>
+                
+                <div class="loading-container" id="loadingContainer">
+                    <div class="cyber-spinner">
+                        <div class="spinner-inner"></div>
+                    </div>
+                    <p class="loading-text">Scanning threat feeds...</p>
+                </div>
+                
+                <div class="feed-items" id="feedContainer">
+                    <!-- Feed items will be added here dynamically -->
+                </div>
+                
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h3>No threat intelligence data</h3>
+                    <p>Either all feeds are currently offline or your filters have no matching results.</p>
+                    <button id="emptyStateRefresh" class="btn-primary">Refresh Feeds</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <p>Cyber Threat Intelligence Dashboard | <span id="totalFeedCount">0</span> sources monitored</p>
+                <p class="copyright">© 2025 Kush Janani. All rights reserved.</p>
+            </div>
+            <div class="footer-controls">
+                <button id="footerRefresh" class="footer-button">
+                    <i class="fas fa-sync-alt"></i> Manual Refresh
+                </button>
+                <span class="version">v1.0.0</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dashboard Settings</h2>
+                <button class="close-button" id="closeSettings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <label for="themeSelect">Theme</label>
+                        <select id="themeSelect" class="settings-select">
+                            <option value="dark">Dark (Default)</option>
+                            <option value="light">Light</option>
+                            <option value="system">System Preference</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="animationToggle">Animations</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="animationToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Feed Settings</h3>
+                    <div class="setting-item">
+                        <label for="refreshInterval">Auto-refresh Interval</label>
+                        <select id="refreshInterval" class="settings-select">
+                            <option value="300000">5 minutes</option>
+                            <option value="600000" selected>10 minutes</option>
+                            <option value="1800000">30 minutes</option>
+                            <option value="3600000">1 hour</option>
+                            <option value="0">Never (Manual only)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="maxItems">Items per Feed</label>
+                        <select id="maxItems" class="settings-select">
+                            <option value="1">1 item</option>
+                            <option value="3" selected>3 items</option>
+                            <option value="5">5 items</option>
+                            <option value="10">10 items</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Display Options</h3>
+                    <div class="setting-item">
+                        <label for="showDescriptions">Show Descriptions</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="showDescriptions" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="showTimestamps">Show Timestamps</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="showTimestamps" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettings" class="btn-primary">Save Settings</button>
+                <button id="resetSettings" class="btn-secondary">Reset to Default</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feed Item Template (hidden, used by JavaScript) -->
+    <template id="feedItemTemplate">
+        <div class="feed-item">
+            <div class="feed-header">
+                <div class="source-info">
+                    <div class="source-icon">
+                        <i class="fas fa-rss"></i>
+                    </div>
+                    <div class="source-name">Source Name</div>
+                </div>
+                <div class="feed-severity">
+                    <span class="severity-indicator"></span>
+                    <span class="severity-text">Medium</span>
+                </div>
+            </div>
+            <div class="feed-content">
+                <h3 class="feed-title">Feed Title</h3>
+                <div class="feed-description">Description text goes here...</div>
+                <div class="feed-meta">
+                    <span class="feed-timestamp">
+                        <i class="far fa-clock"></i>
+                        <span class="timestamp-text">Timestamp</span>
+                    </span>
+                    <div class="feed-actions">
+                        <button class="action-button bookmark-button" title="Bookmark">
+                            <i class="far fa-bookmark"></i>
+                        </button>
+                        <a href="#" class="action-button read-more" target="_blank" title="Read More">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
