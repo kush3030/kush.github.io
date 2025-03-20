@@ -1,2 +1,2 @@
 # kush.github.io
-Langan Threat Intelligence Dashboard
+Threat Intelligence Dashboard
